@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Shield background -->
+  <path d="M128 20C128 20 60 50 60 120C60 160 100 200 128 220C156 200 196 160 196 120C196 50 128 20 128 20Z" fill="#001f4d" stroke="#ffffff" stroke-width="3"/>
+  
+  <!-- Shield inner highlight -->
+  <path d="M128 30C128 30 70 55 70 120C70 155 105 190 128 208C151 190 186 155 186 120C186 55 128 30 128 30Z" fill="#0033cc"/>
+  
+  <!-- Keyhole outer circle -->
+  <circle cx="128" cy="105" r="20" fill="none" stroke="#ffffff" stroke-width="3"/>
+  
+  <!-- Keyhole top circle -->
+  <circle cx="128" cy="85" r="12" fill="#ffffff"/>
+  
+  <!-- Keyhole bottom rectangle -->
+  <rect x="122" y="115" width="12" height="25" rx="2" fill="#ffffff"/>
+</svg>
