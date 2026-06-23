@@ -1,0 +1,4 @@
+{
+  "text_detection": "huggingface",
+  "url_check": "google_safe_browsing"
+}
