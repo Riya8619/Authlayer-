@@ -1,14 +1,14 @@
+import os
 import requests
 
 from app.services.providers.base import BaseProvider
-from app.core.config_loader import API_KEYS
 
 
 class HuggingFaceProvider(BaseProvider):
 
     def __init__(self):
 
-        self.api_key = API_KEYS["huggingface"]
+        self.api_key = os.getenv("HUGGINGFACE_API_KEY", "")
 
         self.headers = {
             "Authorization": f"Bearer {self.api_key}"
@@ -21,6 +21,13 @@ class HuggingFaceProvider(BaseProvider):
 
     def analyze_text(self, text: str) -> dict:
 
+        if not self.api_key:
+            return {
+                "provider": "huggingface",
+                "success": False,
+                "error": "HUGGINGFACE_API_KEY not configured"
+            }
+
         payload = {
             "inputs": text
         }
@@ -30,15 +37,14 @@ class HuggingFaceProvider(BaseProvider):
             response = requests.post(
                 self.model_url,
                 headers=self.headers,
-                json=payload
+                json=payload,
+                timeout=30
             )
-
-            data = response.json()
 
             return {
                 "provider": "huggingface",
                 "success": True,
-                "data": data
+                "data": response.json()
             }
 
         except Exception as e:
