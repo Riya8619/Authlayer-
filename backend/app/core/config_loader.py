@@ -1,13 +1,6 @@
-import json
-from pathlib import Path
+import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-
-def load_json(path: str):
-
-    with open(BASE_DIR / path, "r") as f:
-        return json.load(f)
-
-
-API_KEYS = load_json("config/api_keys.json")
+API_KEYS = {
+    "google_safe_browsing": os.getenv("GOOGLE_SAFE_BROWSING_API_KEY", ""),
+    "huggingface": os.getenv("HUGGINGFACE_API_KEY", ""),
+}
