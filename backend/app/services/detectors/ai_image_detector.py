@@ -1,9 +1,7 @@
+import os
 import requests
 
-from app.core.config_loader import API_KEYS
-
-
-HF_TOKEN = API_KEYS["huggingface"]
+HF_TOKEN = os.getenv("HUGGINGFACE_API_KEY", "")
 
 HEADERS = {
     "Authorization": f"Bearer {HF_TOKEN}"
@@ -14,23 +12,27 @@ MODEL_URL = (
     "umm-maybe/AI-image-detector"
 )
 
-
 def detect_ai_image(image_bytes: bytes):
+
+    if not HF_TOKEN:
+        return {
+            "success": False,
+            "error": "HUGGINGFACE_API_KEY not configured"
+        }
 
     try:
 
         response = requests.post(
             MODEL_URL,
             headers=HEADERS,
-            data=image_bytes
+            data=image_bytes,
+            timeout=30
         )
-
-        result = response.json()
 
         return {
             "success": True,
             "provider": "huggingface",
-            "result": result
+            "result": response.json()
         }
 
     except Exception as e:
