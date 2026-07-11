@@ -1,0 +1,74 @@
+# =========================================
+# Backend (FastAPI / Python) — backend/
+# =========================================
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Databases (local/dev fallback only — production uses Neon)
+*.db
+*.sqlite3
+
+# Uploads / runtime artifacts
+uploads/
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================================
+# Frontend (Next.js) — auth-layer-dashboard/
+# =========================================
+
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel/
+
+# =========================================
+# Shared — environment variables & editors
+# =========================================
+
+# Environment variables (never commit real secrets)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
