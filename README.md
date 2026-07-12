@@ -1,110 +1,94 @@
-# AuthLayer API
+# AuthLayer Dashboard
 
-FastAPI backend for AI-powered content trust verification. Scans images and URLs, detects AI-generated media, checks metadata integrity, screens URLs for phishing/malware signals, and returns a computed trust score with a full forensic breakdown.
-
-Live companion frontend: [AuthLayer Dashboard](https://github.com/<your-username>/authlayer-frontend)
+Next.js frontend for AI-powered content authenticity verification. Upload an image or submit a URL and get a real-time trust score, AI-detection probability, metadata integrity report, and full forensic breakdown — powered by the [AuthLayer API](https://github.com/<your-username>/authlayer-backend).
 
 ## Features
 
-- **Image scanning** — Pillow/ImageHash/ExifRead-based forensic analysis (entropy, edge noise, compression artifacts, EXIF metadata integrity, perceptual-hash duplicate detection)
-- **URL scanning** — structural/heuristic phishing detection (suspicious TLDs, brand impersonation, punycode, IP-hosts, open redirects) plus optional Google Safe Browsing lookup
-- **AI-generated content detection** — optional HuggingFace Inference API integration, blended with local heuristics
-- **Trust scoring engine** — a single scoring module (`app/services/scoring.py`) aggregates all signals into a 0–100 trust score, risk level, and explanations
-- **Persistent scan history** — every scan is saved to PostgreSQL and retrievable via `GET /history`
-- **Centralized error handling** — consistent `{ success, error }` JSON shape for all failures (validation, HTTP, and unhandled exceptions)
+- **Live content scan** — drag-and-drop image upload or URL input, with client-side file type/size validation
+- **Real-time trust dashboard** — trust score, risk level, AI-generation probability, metadata integrity, forensic detail cards
+- **Persistent scan history** — hydrated from the backend's `/history` endpoint on load
+- **Marketing pages** — Platform, Solutions, Documentation, Pricing, Contact, all in a single-page app with smooth anchor navigation
+- **Full loading/error states** — scan progress overlay, inline + toast error handling, network/timeout resilience
+- **Responsive, accessible UI** — built with Tailwind CSS + Radix UI primitives
 
 ## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Framework | FastAPI |
-| Server | Uvicorn |
-| Database | PostgreSQL (Neon) via SQLAlchemy |
-| Image processing | Pillow, ImageHash, ExifRead |
-| Validation | Pydantic v2 / pydantic-settings |
-| Deployment | Render |
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| UI primitives | Radix UI / shadcn-style components |
+| Animation | Framer Motion |
+| Forms/validation | React Hook Form + Zod |
+| Deployment | Vercel |
 
 ## Project structure
 
 ```
 app/
-├── api/                  # Route handlers
-│   ├── image_scan.py     # POST /scan-image
-│   ├── url_scan.py       # POST /scan-url
-│   └── history.py        # GET /history, GET /history/{id}
-├── core/
-│   ├── config.py         # Environment-driven settings (Pydantic BaseSettings)
-│   └── logging_config.py
-├── database/
-│   ├── database.py       # Engine, session, connection check
-│   ├── models.py         # ScanHistory ORM model
-│   └── crud.py           # DB read/write operations
-├── schemas/               # Pydantic request/response models
-├── services/
-│   ├── image_analysis.py # Forensic image analysis
-│   ├── url_analysis.py   # URL heuristics
-│   ├── scoring.py         # Trust score aggregation
-│   ├── registry.py        # Provider selection (env-driven)
-│   ├── detectors/          # AI-image + duplicate-hash detectors
-│   └── providers/          # HuggingFace + Google Safe Browsing clients
-└── main.py                # FastAPI app, middleware, exception handlers
+├── page.tsx           # Single-page app: hero, scan panel, dashboard, marketing sections
+├── layout.tsx          # Root layout, fonts, SEO metadata
+├── robots.ts / sitemap.ts
+├── error.tsx           # Global error boundary
+└── not-found.tsx
+components/
+├── navbar.tsx
+├── hero-section.tsx
+├── upload-panel.tsx           # Drag/drop + URL input, client-side validation
+├── trust-results-dashboard.tsx
+├── scan-history-table.tsx
+├── marketing-sections.tsx      # Documentation, Pricing, Contact
+└── ui/                          # Reusable primitives (button, dialog, input, etc.)
+hooks/
+└── use-scan-workflow.ts        # Scan orchestration, progress simulation, history hydration
+lib/
+├── api.ts             # API service layer — all backend calls, validation, error handling
+└── types/scan.ts       # Shared TypeScript types
 ```
 
 ## Getting started (local development)
 
-**Requirements:** Python 3.11+
+**Requirements:** Node.js 20+
 
 ```bash
-git clone https://github.com/<your-username>/authlayer-backend.git
-cd authlayer-backend
+git clone https://github.com/<your-username>/authlayer-frontend.git
+cd authlayer-frontend
 
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+npm install
 
-pip install -r requirements.txt
+cp .env.example .env.local       # then set NEXT_PUBLIC_API_BASE
 
-cp .env.example .env            # then fill in DATABASE_URL at minimum
-
-uvicorn app.main:app --reload
+npm run dev
 ```
 
-The API will be available at `http://127.0.0.1:8000`. Interactive docs at `http://127.0.0.1:8000/docs`.
+The app will be available at `http://localhost:3000`.
 
 ## Environment variables
 
-See `.env.example` for the full list with descriptions. Required:
+See `.env.example`. Both are required for a working deployment:
 
 | Variable | Required | Notes |
 |---|---|---|
-| `DATABASE_URL` | ✅ | PostgreSQL connection string (Neon). Must include `?sslmode=require`. App fails to start without it. |
-| `ALLOWED_ORIGINS` | ✅ | Comma-separated list of allowed frontend origins for CORS |
-| `HUGGINGFACE_API_KEY` | optional | Enables AI-generated-image detection; skipped (heuristics-only) if unset |
-| `GOOGLE_SAFE_BROWSING_API_KEY` | optional | Enables live URL threat lookups; skipped if unset |
-| `TEXT_DETECTION_PROVIDER` | optional | Default: `huggingface` |
-| `URL_CHECK_PROVIDER` | optional | Default: `google_safe_browsing` |
-| `PROVIDER_TIMEOUT_SECONDS` | optional | Default: `15` |
+| `NEXT_PUBLIC_API_BASE` | ✅ | Base URL of the AuthLayer backend, no trailing slash (e.g. `https://authlayer-backend.onrender.com`). No localhost fallback — scans show a clear "not configured" error until this is set. |
+| `NEXT_PUBLIC_SITE_URL` | recommended | Your deployed frontend URL, used for SEO metadata (Open Graph, sitemap) |
 
-## API endpoints
+## Available scripts
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/` | Basic liveness check |
-| `GET` | `/health` | Health + database connectivity status |
-| `POST` | `/scan-image` | Multipart file upload → forensic trust analysis |
-| `POST` | `/scan-url` | JSON `{ "url": "..." }` → structural/phishing trust analysis |
-| `GET` | `/history` | List of persisted scans |
-| `GET` | `/history/{scan_id}` | Single scan detail |
+```bash
+npm run dev      # Start dev server
+npm run build    # Production build
+npm run start    # Serve production build locally
+npm run lint     # ESLint
+```
 
-All scan responses return camelCase JSON matching the frontend's expected shape: `trustScore`, `riskLevel`, `aiGeneratedProbability`, `metadataIntegrity`, `duplicateCount`, `explanations`, `forensicDetails`.
-
-## Deployment (Render)
-
-This repo includes a `render.yaml` and `Procfile` and deploys as-is:
+## Deployment (Vercel)
 
 1. Push to GitHub
-2. Render → New → Web Service → connect this repo (auto-detects `render.yaml`)
-3. Set `DATABASE_URL` and `ALLOWED_ORIGINS` in the Render dashboard (marked `sync: false` in `render.yaml`, so they must be set manually — never committed)
-4. Deploy — health check path is `/health`
+2. Vercel → Add New → Project → import this repo
+3. Set `NEXT_PUBLIC_API_BASE` and `NEXT_PUBLIC_SITE_URL` in Project Settings → Environment Variables
+4. Deploy
+5. Back on the backend (Render), set `ALLOWED_ORIGINS` to this Vercel URL so CORS allows requests
 
 ## License
 
