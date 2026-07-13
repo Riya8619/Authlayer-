@@ -1,6 +1,6 @@
 # AuthLayer Dashboard
 
-Next.js frontend for AI-powered content authenticity verification. Upload an image or submit a URL and get a real-time trust score, AI-detection probability, metadata integrity report, and full forensic breakdown — powered by the [AuthLayer API](https://github.com/<your-username>/authlayer-backend).
+Next.js frontend for AI-powered content authenticity verification. Upload an image or submit a URL and get a real-time trust score, AI-detection probability, metadata integrity report, and full forensic breakdown.
 
 ## Features
 
