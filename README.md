@@ -71,7 +71,7 @@ See `.env.example`. Both are required for a working deployment:
 | Variable | Required | Notes |
 |---|---|---|
 | `NEXT_PUBLIC_API_BASE` | ✅ | Base URL of the AuthLayer backend, no trailing slash (e.g. `https://authlayer-backend.onrender.com`). No localhost fallback — scans show a clear "not configured" error until this is set. |
-| `NEXT_PUBLIC_SITE_URL` | recommended | Your deployed frontend URL, used for SEO metadata (Open Graph, sitemap) |
+| `NEXT_PUBLIC_SITE_URL` | ✅ | Base URL of  frontend URL, used for SEO metadata (Open Graph, sitemap) |
 
 ## Available scripts
 
